@@ -1,0 +1,4 @@
+# Prisma Migrate lockfile v1
+
+20200918221818-student_course_admin_instructor_migration001
+20200918224051-added_created-at_column
