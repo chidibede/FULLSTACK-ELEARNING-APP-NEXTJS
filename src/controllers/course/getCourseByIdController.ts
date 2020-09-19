@@ -5,22 +5,27 @@ import { PrismaClient } from "@prisma/client";
 // instantiate the prisma client
 const prisma = new PrismaClient();
 
-export const getInstructor = async (
+export const getCourseById = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
   try {
-    const instructors = await prisma.instructor.findMany({
+    const { id } = req.query;
+    const ID = parseInt(id.toString());
+    const courses = await prisma.course.findOne({
+      where: {
+        id: ID,
+      },
       include: {
-        courses: true,
+        instructor: true,
       },
     });
-    res.status(200).json({ success: true, data: instructors });
+    res.status(200).json({ success: true, data: courses });
   } catch (err) {
     console.log(err);
     res
       .status(500)
-      .json({ success: false, message: "Error retrieving instructors" });
+      .json({ success: false, message: "Error retrieving courses" });
   } finally {
     await prisma.$disconnect();
   }
