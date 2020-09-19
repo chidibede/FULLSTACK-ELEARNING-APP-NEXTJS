@@ -7,7 +7,7 @@ export const authMiddleware = (apiRoute: NextApiHandler) => async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  jwt.verify(req.headers.authorization!, secret, async (error, decoded) => {
+  jwt.verify(req.cookies.authorization!, secret, async (error, decoded) => {
     if (!error && decoded) {
       return await apiRoute(req, res);
     }

@@ -1,19 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
-import { LoginAdminInterface } from "../../interfaces/adminInterface";
-import { LoginAdminValidation } from "../../validations/adminValidation";
+import { LoginStudentInterface } from "../../interfaces/studentInterface";
+import { LoginStudentValidation } from "../../validations/studentValidation";
 import { issueToken } from "../../authentication/issueToken";
 import cookie from "cookie";
 
 // instantiate the prisma client
 const prisma = new PrismaClient();
 
-export const loginAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
+export const loginStudent = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
   try {
-    const body: LoginAdminInterface = req.body;
-    const { error } = LoginAdminValidation(body);
-    const adminMatch = await prisma.admin.findOne({
+    const body: LoginStudentInterface = req.body;
+    const { error } = LoginStudentValidation(body);
+    const studentMatch = await prisma.student.findOne({
       where: {
         username: body.username,
       },
@@ -21,26 +24,26 @@ export const loginAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (error) {
       res.status(401).json({ success: false, message: error.message });
-    } else if (!adminMatch) {
+    } else if (!studentMatch) {
       res
         .status(403)
         .json({ success: false, message: "Invalid username or password" });
     } else {
-      const validAdmin = await bcrypt.compare(
+      const validStudent = await bcrypt.compare(
         body.password,
-        adminMatch.password
+        studentMatch.password
       );
 
-      if (validAdmin) {
-        const admin = await prisma.admin.findOne({
+      if (validStudent) {
+        const student = await prisma.student.findOne({
           where: {
             username: body.username,
           },
         });
         const data = {
-          id: admin.id,
-          username: admin.username,
-          email: admin.email,
+          id: student.id,
+          username: student.username,
+          email: student.email,
         };
         const jwt: string = await issueToken(data);
         res.setHeader(
@@ -63,7 +66,7 @@ export const loginAdmin = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: "Error logging admins" });
+    res.status(500).json({ success: false, message: "Error logging students" });
   } finally {
     await prisma.$disconnect();
   }
