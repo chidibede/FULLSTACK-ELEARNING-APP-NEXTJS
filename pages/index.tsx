@@ -1,5 +1,6 @@
 import Head from "next/head";
+import Navbar from "../components/layouts/Navbar";
 
 export default function Home() {
-  return <div>{process.env.NEXT_PUBLIC_PORT}</div>;
+  return <Navbar />;
 }
